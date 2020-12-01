@@ -4,14 +4,9 @@ class Day1(input : List<String>) {
     private val entries = input.map { it.toInt() }
 
     fun solvePart1() : Int {
-        val sortedEntries = entries.sortedDescending()
-
-        for (entry in sortedEntries) {
-            for (index in sortedEntries.size-1 downTo 0) {
-                val secondEntry = sortedEntries[index]
-                if (entry + secondEntry > NUM_TO_SUM_TO) break
-                else if (entry + secondEntry == NUM_TO_SUM_TO) return entry * secondEntry
-            }
+        for (firstEntry in entries) {
+            val requiredSecondEntry = NUM_TO_SUM_TO - firstEntry
+            if (entries.contains(requiredSecondEntry)) return requiredSecondEntry * firstEntry
         }
 
         return -1
