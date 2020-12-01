@@ -1,9 +1,5 @@
 package advent2020
 
-fun main() {
-    println(Day1(Resources.resourceAsList("day1.input")).solvePart2())
-}
-
 class Day1(input : List<String>) {
     private val entries = input.map { it.toInt() }
 
@@ -13,8 +9,8 @@ class Day1(input : List<String>) {
         for (entry in sortedEntries) {
             for (index in sortedEntries.size-1 downTo 0) {
                 val secondEntry = sortedEntries[index]
-                if (entry + secondEntry > 2020) break
-                else if (entry + secondEntry == 2020) return entry * secondEntry
+                if (entry + secondEntry > NUM_TO_SUM_TO) break
+                else if (entry + secondEntry == NUM_TO_SUM_TO) return entry * secondEntry
             }
         }
 
@@ -27,13 +23,17 @@ class Day1(input : List<String>) {
         for (entry in sortedEntries) {
             for (index in sortedEntries.size-1 downTo 0) {
                 val secondEntry = sortedEntries[index]
-                if (entry + secondEntry > 2020) break
+                if (entry + secondEntry > NUM_TO_SUM_TO) break
 
-                val thirdEntryRequired = 2020 - entry - secondEntry
+                val thirdEntryRequired = NUM_TO_SUM_TO - entry - secondEntry
                 if (sortedEntries.contains(thirdEntryRequired)) return entry * secondEntry * thirdEntryRequired
             }
         }
 
         return -1
+    }
+
+    companion object {
+        const val NUM_TO_SUM_TO = 2020
     }
 }
