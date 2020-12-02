@@ -13,8 +13,8 @@ class Day2(input : List<String>) {
         private val password: String) {
 
         fun passwordMeetsPolicy(): Boolean {
-            val passwordCharMap = password.groupBy { it }
-                .mapValues { it.value.size }
+            val passwordCharMap = password.groupingBy { it }
+                .eachCount()
 
             return policyRange.contains(passwordCharMap.getOrDefault(policyCharacter, 0))
         }
