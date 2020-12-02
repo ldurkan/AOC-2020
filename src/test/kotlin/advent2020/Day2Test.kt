@@ -8,22 +8,22 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
-@DisplayName("Day 1")
-class Day1Test {
+@DisplayName("Day 2")
+class Day2Test {
 
     @Nested
     @DisplayName("Part 1")
     inner class Part1 {
         @ParameterizedTest()
-        @MethodSource("advent2020.Day1Test#examplesP1")
+        @MethodSource("advent2020.Day2Test#examplesP1")
         fun `matches examples`(input: List<String>, expected: Int) {
-            assertThat(Day1(input).solvePart1()).isEqualTo(expected)
+            assertThat(Day2(input).solvePart1()).isEqualTo(expected)
         }
 
         @Test
         fun `matches actual`() {
-            assertThat(Day1(Resources.resourceAsList("day1.input")).solvePart1())
-                .isEqualTo(158916)
+            assertThat(Day2(Resources.resourceAsList("day2.input")).solvePart1())
+                .isEqualTo(643)
         }
     }
 
@@ -31,15 +31,15 @@ class Day1Test {
     @DisplayName("Part 2")
     inner class Part2 {
         @ParameterizedTest
-        @MethodSource("advent2020.Day1Test#examplesP2")
+        @MethodSource("advent2020.Day2Test#examplesP2")
         fun `matches examples`(input: List<String>, expected: Int) {
-            assertThat(Day1(input).solvePart2()).isEqualTo(expected)
+            assertThat(Day2(input).solvePart2()).isEqualTo(expected)
         }
 
         @Test
         fun `matches actual`() {
-            assertThat(Day1(Resources.resourceAsList("day1.input")).solvePart2())
-                .isEqualTo(165795564)
+            assertThat(Day2(Resources.resourceAsList("day2.input")).solvePart2())
+                .isEqualTo(388)
         }
     }
 
@@ -47,16 +47,16 @@ class Day1Test {
         @JvmStatic
         fun examplesP1() : List<Arguments> = listOf(
             Arguments.of(
-                listOf("1721", "979", "366", "299", "675", "1456"),
-                514579
+                listOf("1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"),
+                2
             )
         )
 
         @JvmStatic
         fun examplesP2() : List<Arguments> = listOf(
             Arguments.of(
-                listOf("1721", "979", "366", "299", "675", "1456"),
-                241861950
+                listOf("1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"),
+                1
             )
         )
     }
