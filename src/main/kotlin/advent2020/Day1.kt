@@ -29,6 +29,6 @@ class Day1(input : List<String>) {
     }
 
     companion object {
-        const val NUM_TO_SUM_TO = 2020
+        private const val NUM_TO_SUM_TO = 2020
     }
 }

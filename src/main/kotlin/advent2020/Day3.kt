@@ -23,12 +23,12 @@ class Day3(private val mapRows: List<MapRow>) {
 
     private fun String.isPositionTree(pos : Int) = this[pos % this.length] == TREE
 
-    data class Slope(val right: Int, val down : Int)
+    private data class Slope(val right: Int, val down : Int)
 
     companion object {
-        const val TREE = '#'
+        private const val TREE = '#'
 
-        val slopesToCheck = listOf(
+        private val slopesToCheck = listOf(
             Slope(1, 1),
             Slope(3, 1),
             Slope(5, 1),

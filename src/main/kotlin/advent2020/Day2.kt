@@ -7,7 +7,7 @@ class Day2(input : List<String>) {
 
     fun solvePart2() : Int = passwordWithPolicies.count { it.passwordMeetsNewPolicy()}
 
-    data class PasswordWithPolicy(
+    private data class PasswordWithPolicy(
         private val policyRange: IntRange,
         private val policyCharacter: Char,
         private val password: String) {
