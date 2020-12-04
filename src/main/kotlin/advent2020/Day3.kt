@@ -1,6 +1,6 @@
 package advent2020
 
-typealias MapRow = String
+private typealias MapRow = String
 
 class Day3(private val mapRows: List<MapRow>) {
 
