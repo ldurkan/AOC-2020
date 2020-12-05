@@ -29,13 +29,13 @@ class Day5(private val passes : List<String>) {
         var currentMin = min.toDouble()
 
         for (pos in 0 until input.length - 1) {
-            if (input[pos] == LOWER_ROW || input[pos] == LOWER_COL)
+            if (input[pos] in LOWER_HALF)
                 currentMax = floor((currentMin + currentMax) / 2)
             else
                 currentMin = ceil((currentMin + currentMax) / 2)
         }
 
-        return if (input.last() == LOWER_COL || input.last() == LOWER_ROW)
+        return if (input.last() in LOWER_HALF)
             currentMin.toInt()
         else
             currentMax.toInt()
@@ -44,11 +44,11 @@ class Day5(private val passes : List<String>) {
     private fun Pair<Int, Int>.getIdInMiddle()  : Int = this.first + 1
 
     companion object {
-        private const val LOWER_ROW = 'F'
-        private const val LOWER_COL = 'L'
         private const val ROW_PARTITION_SIZE = 7
         private const val COL_PARTITION_SIZE = 3
         private const val MAX_ROW_NUM = 127
         private const val MAX_COL_NUM = 7
+
+        private val LOWER_HALF = listOf('F', 'L')
     }
 }
