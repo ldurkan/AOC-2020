@@ -39,7 +39,7 @@ class Day7Test {
         @Test
         fun `matches actual`() {
             assertThat(Day7(Resources.resourceAsList("day7.input")).solvePart2())
-                .isEqualTo(3445)
+                .isEqualTo(8015)
         }
     }
 

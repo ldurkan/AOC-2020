@@ -11,8 +11,7 @@ class Day7(input : List<String>) {
     private fun bagsContainedInRoot(root : Bag) : Int {
         if (root.contains.isEmpty()) return 1
         return root.contains.map {
-            val blah = it.second * bagsContainedInRoot(allBags[it.first]!!)
-            blah
+            it.second * bagsContainedInRoot(allBags[it.first] ?: error("Couldn't find bag ${it.first}"))
         }.sum() + 1
     }
 
@@ -31,11 +30,11 @@ class Day7(input : List<String>) {
         private fun parse(input : List<String>) : Map<String, Bag> {
             val bags = mutableMapOf<String, Bag>()
             input.forEach { line ->
-                val args = line.split(" contain ")
-                var bag = Bag(args[0].substring(0 until args[0].lastIndexOf(' ')))
-                bag = bags.putIfAbsent(bag.id, bag) ?: bag
+                val args = line.split(" bags contain ")
+                var topBag = Bag(args[0])
+                topBag = bags.putIfAbsent(topBag.id, topBag) ?: topBag
                 args[1].split(", ")
-                    .map {it.substring(0 until it.lastIndexOf(' ')).trim()}
+                    .map {it.substring(0 until it.lastIndexOf(' '))}
                     .forEach {
                         if (it != "no other") {
                             val firstSpace = it.indexOf(" ")
@@ -43,8 +42,8 @@ class Day7(input : List<String>) {
                             val amount = it.substring(0 until firstSpace).toInt()
 
                             bags.putIfAbsent(name, Bag(name))
-                            bags[name]!!.containedIn.add(Pair(amount, bag.id))
-                            bag.contains.add(Pair(name, amount))
+                            bags[name]?.containedIn?.add(Pair(amount, topBag.id))
+                            topBag.contains.add(Pair(name, amount))
                         }
                     }
             }
@@ -52,10 +51,10 @@ class Day7(input : List<String>) {
             return bags
         }
     }
-}
 
-data class Bag(val id: String) {
-    val containedIn = mutableListOf<Pair<Int, String>>()
+    private data class Bag(val id: String) {
+        val containedIn = mutableListOf<Pair<Int, String>>()
 
-    val contains = mutableListOf<Pair<String, Int>>()
+        val contains = mutableListOf<Pair<String, Int>>()
+    }
 }
