@@ -20,6 +20,8 @@ class Day6(input : String) {
             .count()
     }
 
+    //test
+
     companion object {
         private fun parse(input : String) : List<String> = input.split("\n\n")
     }
