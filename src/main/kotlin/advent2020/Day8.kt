@@ -7,7 +7,7 @@ class Day8(private val instructions : List<Instruction>) {
     fun solvePart1() : Int = runInstructions(instructions).accumulator
 
     fun solvePart2() : Int = instructions.mapIndexed { index, instr -> Pair(index, instr) }
-        .filterNot { it.second.startsWith("acc") }
+        .filterNot { it.second.startsWith(CMND_ACCUMULATOR) }
         .asSequence()
         .map { (instrPos, instr) ->
             val instructionsCopy = instructions.toMutableList()
@@ -22,8 +22,8 @@ class Day8(private val instructions : List<Instruction>) {
     private fun Instruction.flipInstruction() : Instruction {
         val (instrType, amount) = this.split(" ")
 
-        return if (instrType == "jmp") "nop $amount"
-        else "jmp $amount"
+        return if (instrType == CMND_JUMP) "$CMND_NO_OP $amount"
+        else "$CMND_JUMP $amount"
     }
 
     private fun runInstructions(instructions : List<Instruction>) : Result {
@@ -39,9 +39,9 @@ class Day8(private val instructions : List<Instruction>) {
             val instrType = args[0]
             val amount = args[1].toInt()
 
-            if (instrType == "acc") accumulator += amount
+            if (instrType == CMND_ACCUMULATOR) accumulator += amount
 
-            if (instrType == "jmp") pointerPos += amount
+            if (instrType == CMND_JUMP) pointerPos += amount
             else pointerPos++
         }
 
@@ -49,4 +49,10 @@ class Day8(private val instructions : List<Instruction>) {
     }
 
     private data class Result(val accumulator : Int, val pointerPos : Int)
+
+    companion object {
+        const val CMND_JUMP = "jmp"
+        const val CMND_ACCUMULATOR = "acc"
+        const val CMND_NO_OP = "nop"
+    }
 }
