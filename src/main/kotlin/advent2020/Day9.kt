@@ -2,60 +2,59 @@ package advent2020
 
 import kotlin.math.abs
 
-fun main() {
-    println(Day9(Resources.resourceAsList("day9.input")).solvePart2())
-}
-
-class Day9(input : List<String>) {
+class Day9(input: List<String>) {
     private val numbers = input.map { it.toLong() }
 
-    fun solvePart1(preambleSize : Int = 25) : Long = findFirstNumDoesNotSum(preambleSize).first
+    fun solvePart1(preambleSize: Int = 25): Long = findFirstNumDoesNotSum(preambleSize).numThatDoesNotMatch
 
-    fun solvePart2(preambleSize: Int = 25) : Long = findFirstNumDoesNotSum(preambleSize).second
+    fun solvePart2(preambleSize: Int = 25): Long = findContiguousRangeSumForNum(findFirstNumDoesNotSum(preambleSize))
 
-    private fun findFirstNumDoesNotSum(preambleSize: Int) : Pair<Long, Long> {
+    private fun findFirstNumDoesNotSum(preambleSize: Int): Result {
         val numToCheck = numbers.take(preambleSize).toMutableList()
         val data = numbers.drop(preambleSize)
-        val runningTotals = mutableListOf<Pair<Long, Long>>()
+        val runningTotals = linkedMapOf<Long, List<Long>>()
         var currentTotal = 0L
         numToCheck.forEach {
-            if (currentTotal == 0L) runningTotals.add(Pair(it, it))
-            else runningTotals.add(Pair(it, currentTotal + it))
+            if (currentTotal == 0L) runningTotals[it] = listOf(it)
+            else runningTotals[currentTotal + it] = runningTotals[currentTotal]!! + it
             currentTotal += it
         }
 
-         val notMatchNum = data.asSequence()
+        val notMatchNum = data.asSequence()
             .map { currentNum ->
-                numToCheck.toList().asSequence()
+                numToCheck.toList()
+                    .asSequence()
                     .map {
                         if (numToCheck.contains(abs(currentNum - it))) {
                             numToCheck.add(currentNum)
-                            numToCheck.removeAt(0)
-                            currentTotal+= currentNum
-                            runningTotals.add(Pair(currentNum, currentTotal))
-                            Pair(currentNum, true)
-                        }
-                        else Pair(currentNum, false)
+                            numToCheck.removeFirst()
+                            runningTotals[currentTotal + currentNum] = runningTotals[currentTotal]!! + currentNum
+                            currentTotal += currentNum
+                           true
+                        } else false
                     }
-                    .firstOrNull {it.second} ?: Pair(currentNum, false)
+                    .firstOrNull{it}
+                    .let { Pair(currentNum, it != null) }
             }
-            .first {!it.second}
-             .first
+            .first { !it.second }
+            .first
 
-        val contiguousRangeSum = runningTotals.asSequence()
-            .mapIndexed { index, maybeRangeEnd ->
-                if (maybeRangeEnd.second >= notMatchNum) {
-                    val rangeStart = runningTotals.find { it.second == maybeRangeEnd.second - notMatchNum}
-                    if (rangeStart != null) {
-                        runningTotals.subList(runningTotals.indexOf(rangeStart) + 1, index)
-                    } else null
-                } else null
-            }.firstOrNull {it != null}!!
-            .map { it.first }
-            .let {
-                it.minOrNull()!! + it.maxOrNull()!!
-            }
-
-        return Pair(notMatchNum, contiguousRangeSum)
+        return Result(notMatchNum, runningTotals)
     }
+
+    private fun findContiguousRangeSumForNum(result: Result): Long {
+        val (numToMatch, runningTotals) = result
+        return runningTotals.asSequence()
+            .filter { it.key >= numToMatch }
+            .first { runningTotals.containsKey(it.key - numToMatch) }
+            .let { rangeEnd ->
+                val rangeStart = runningTotals[rangeEnd.key - numToMatch]
+                    ?: error("Could not find entry after filter")
+                val contiguousRange = rangeEnd.value.drop(rangeStart.count())
+
+                contiguousRange.minOrNull()!! + contiguousRange.maxOrNull()!!
+            }
+    }
+
+    private data class Result(val numThatDoesNotMatch: Long, val runningTotals: Map<Long, List<Long>>)
 }
