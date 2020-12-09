@@ -24,16 +24,14 @@ class Day9(input: List<String>) {
             .map { currentNum ->
                 numToCheck.toList()
                     .asSequence()
+                    .filter { numToCheck.contains(abs(currentNum - it)) }
                     .map {
-                        if (numToCheck.contains(abs(currentNum - it))) {
-                            numToCheck.add(currentNum)
-                            numToCheck.removeFirst()
-                            runningTotals[currentTotal + currentNum] = runningTotals[currentTotal]!! + currentNum
-                            currentTotal += currentNum
-                           true
-                        } else false
+                        numToCheck.add(currentNum)
+                        numToCheck.removeFirst()
+                        runningTotals[currentTotal + currentNum] = runningTotals[currentTotal]!! + currentNum
+                        currentTotal += currentNum
                     }
-                    .firstOrNull{it}
+                    .firstOrNull()
                     .let { Pair(currentNum, it != null) }
             }
             .first { !it.second }
