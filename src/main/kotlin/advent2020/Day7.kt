@@ -3,10 +3,12 @@ package advent2020
 class Day7(input : List<String>) {
     private val allBags = parse(input)
 
-    fun solvePart1() : Int = bagsThatHoldRoot(allBags["shiny gold"] ?: error("Could not find shiny gold bag"))
+    fun solvePart1() : Int = bagsThatHoldRoot(allBags[ROOT_BAG_NAME]
+        ?: error("Could not find root bag $ROOT_BAG_NAME"))
         .count()
 
-    fun solvePart2() : Int = bagsContainedInRoot(allBags["shiny gold"] ?: error("Could not find shiny gold bag")) - 1
+    fun solvePart2() : Int = bagsContainedInRoot(allBags[ROOT_BAG_NAME]
+        ?: error("Could not find root bag $ROOT_BAG_NAME")) - 1
 
     private fun bagsContainedInRoot(root : Bag) : Int {
         if (root.contains.isEmpty()) return 1
@@ -27,6 +29,8 @@ class Day7(input : List<String>) {
     }
 
     companion object {
+        const val ROOT_BAG_NAME = "shiny gold"
+        
         private fun parse(input : List<String>) : Map<String, Bag> {
             val bags = mutableMapOf<String, Bag>()
             input.forEach { line ->
