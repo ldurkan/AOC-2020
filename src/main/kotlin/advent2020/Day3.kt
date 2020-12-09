@@ -21,7 +21,7 @@ class Day3(private val mapRows: List<MapRow>) {
         return treeCounter
     }
 
-    private fun String.isPositionTree(pos : Int) = this[pos % this.length] == TREE
+    private fun MapRow.isPositionTree(pos : Int) = this[pos % this.length] == TREE
 
     private data class Slope(val right: Int, val down : Int)
 

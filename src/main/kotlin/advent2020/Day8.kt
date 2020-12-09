@@ -1,6 +1,6 @@
 package advent2020
 
-typealias Instruction = String
+private typealias Instruction = String
 
 class Day8(private val instructions : List<Instruction>) {
 

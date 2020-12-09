@@ -14,7 +14,7 @@ class Day4(input: String) {
         .filter { fields -> fields.allFieldsValid() }
         .count()
 
-    private fun Map<String, String>.allFieldsValid(): Boolean = this.entries.all { it.isValidField() }
+    private fun Passport.allFieldsValid(): Boolean = this.entries.all { it.isValidField() }
 
     private fun Map.Entry<String, String>.isValidField(): Boolean =
         when (key) {
