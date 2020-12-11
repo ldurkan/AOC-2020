@@ -30,7 +30,7 @@ class Day7(input : List<String>) {
 
     companion object {
         const val ROOT_BAG_NAME = "shiny gold"
-        
+
         private fun parse(input : List<String>) : Map<String, Bag> {
             val bags = mutableMapOf<String, Bag>()
             input.forEach { line ->
