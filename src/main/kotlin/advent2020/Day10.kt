@@ -1,10 +1,5 @@
 package advent2020
 
-import java.util.*
-
-fun main() {
-    println(Day10(Resources.resourceAsList("day10.input")).solvePart2())
-}
 
 class Day10(rawInput : List<String>) {
     private val adapters = rawInput.map { it.toInt() }
