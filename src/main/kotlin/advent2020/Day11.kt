@@ -1,84 +1,91 @@
 package advent2020
 
-typealias SeatState = Array<CharArray>
+private typealias SeatState = Array<CharArray>
 
-fun main() {
-    println(Day11(Resources.resourceAsList("day11.input")).solvePart2())
-}
+class Day11(private val rawInput : List<String>) {
 
-class Day11(rawInput : List<String>) {
-    private val seating = SeatResolver(rawInput)
-
-    fun solvePart1() : Int = seating
+    fun solvePart1() : Int = SeatResolver(rawInput)
         .apply { this.getConsistentState() }
         .numOccupiedSeats()
 
-    fun solvePart2() : Int = seating
-        .apply { this.getConsistentState(immediate = false, seatsToBeOccupied = 5) }
+    fun solvePart2() : Int = SeatResolver(rawInput, immediate = false, seatsToBeOccupied = 5)
+        .apply { this.getConsistentState() }
         .numOccupiedSeats()
 
-    private class SeatResolver(input : List<String>) {
+    private class SeatResolver(input : List<String>, immediate: Boolean = true, private val seatsToBeOccupied: Int = 4) {
         private val maxY = input.size - 1
         private val maxX  = input.first().length - 1
         private var currentState = parse(input)
         private var previousState : SeatState? = null
+        private val seatNeighbours = createSeatNeighboursMapping(currentState, immediate)
 
-        fun getConsistentState(immediate: Boolean = true, seatsToBeOccupied: Int = 4) {
+        fun getConsistentState() {
             while (!currentState.contentDeepEquals(previousState)) {
-                val newState = applyRules(currentState, immediate, seatsToBeOccupied)
+                val newState = applyRules(currentState)
                 previousState = currentState
                 currentState = newState
             }
         }
 
         fun numOccupiedSeats() : Int = currentState.flatMap { it.toList() }
-            .count { it ==  '#' }
+            .count { it ==  OCCUPIED }
 
-        private fun applyRules(state : SeatState, immediate: Boolean, seatsToBeOccupied: Int) : SeatState {
-            val newState = state.copyOf()
-
-            return newState.mapIndexed { y, row ->
+        private fun applyRules(state : SeatState) : SeatState =
+            state.mapIndexed { y, row ->
                 row.mapIndexed { x, char ->
-                    val currentPoint = Point(x , y)
-                    when(char) {
-                        '.' -> char
-                        'L' -> if (seatShouldBeOccupied(state, currentPoint, immediate)) '#' else char
-                        '#' -> if (seatShouldBeFreed(state, currentPoint, seatsToBeOccupied, immediate)) 'L' else char
+                    val currentPoint = Point(x, y)
+                    when (char) {
+                        FLOOR -> char
+                        UNOCCUPIED -> if (seatShouldBeOccupied(state, currentPoint)) OCCUPIED else char
+                        OCCUPIED -> if (seatShouldBeFreed(state, currentPoint)) UNOCCUPIED else char
                         else -> throw IllegalStateException("Unknown char representation $char")
                     }
                 }.toCharArray()
             }.toTypedArray()
-        }
 
-        private fun seatShouldBeOccupied(state: SeatState, currentPoint: Point, immediate : Boolean): Boolean =
-            currentPoint.getAllNeighbours()
-                .map { if (immediate) it else getNextSeatPointInDirection(state, currentPoint, it) }
-                .filter { it.x in 0..maxX && it.y in 0..maxY}
+
+        private fun seatShouldBeOccupied(state: SeatState, currentPoint: Point): Boolean =
+            seatNeighbours.getValue(currentPoint)
                 .all { state.get(it) != '#' }
 
 
-        private fun seatShouldBeFreed(state: SeatState, currentPoint: Point, seatsToBeOccupied : Int,
-                                      immediate: Boolean) : Boolean =
-            currentPoint.getAllNeighbours()
-                .map { if (immediate) it else getNextSeatPointInDirection(state, currentPoint, it) }
-                .filter { it.x in 0..maxX && it.y in 0..maxY}
+        private fun seatShouldBeFreed(state: SeatState, currentPoint: Point) : Boolean =
+            seatNeighbours.getValue(currentPoint)
                 .count { state.get(it) == '#' } >= seatsToBeOccupied
 
-        private fun getNextSeatPointInDirection(state: SeatState, start : Point, direction: Point) : Point {
+        private fun createSeatNeighboursMapping(state: SeatState, immediate: Boolean) : Map<Point, List<Point>> {
+            return state.mapIndexed { y, row ->
+                row.mapIndexed { x, _ ->
+                    Point(x, y)
+                }}
+                .flatten()
+                .map { current -> current to current.getAllNeighbours()
+                    .mapNotNull { if (immediate) it.inBounds() else getNextSeatPointInDirection(state, current, it)}
+                }
+                .toMap()
+        }
+
+        private fun getNextSeatPointInDirection(state: SeatState, start : Point, direction: Point) : Point? {
             val xVel = direction.x - start.x
             val yVel = direction.y - start.y
 
-            var currentPoint = direction
-            while (currentPoint.x in 0..maxX && currentPoint.y in 0..maxY && state.get(currentPoint) == '.') {
-                currentPoint = currentPoint.copy(x = currentPoint.x + xVel, y = currentPoint.y + yVel)
-            }
+            var currentPoint : Point? = start
+            do {
+                currentPoint = currentPoint?.copy(x = currentPoint.x + xVel, y = currentPoint.y + yVel)?.inBounds()
+            }  while (currentPoint != null && state.get(currentPoint) == FLOOR)
 
             return currentPoint
         }
 
+        private fun Point.inBounds() : Point? = if (this.x in 0..maxX && this.y in 0..maxY) this else null
+
         private fun SeatState.get(point: Point) : Char = this[point.y][point.x]
 
         companion object {
+            private const val FLOOR = '.'
+            private const val OCCUPIED = '#'
+            private const val UNOCCUPIED = 'L'
+
             fun parse(input : List<String>) : SeatState = input
                 .map { it.toCharArray() }
                 .toTypedArray()

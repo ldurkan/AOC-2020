@@ -39,7 +39,7 @@ class Day11Test {
         @Test
         fun `matches actual`() {
             assertThat(Day11(Resources.resourceAsList("day11.input")).solvePart2())
-                .isEqualTo(193434623148032)
+                .isEqualTo(2054)
         }
     }
 
