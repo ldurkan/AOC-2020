@@ -11,13 +11,13 @@ class Day12(rawInput : List<String>) {
         instructions.forEach {
             val (action, amount) = it
             when (action) {
-                'N' -> currentPoint = currentPoint.moveNorth(amount)
-                'S' -> currentPoint = currentPoint.moveSouth(amount)
-                'E' -> currentPoint = currentPoint.moveEast(amount)
-                'W' -> currentPoint = currentPoint.moveWest(amount)
-                'L' -> currentDirection = currentDirection.turnLeft(amount)
-                'R' -> currentDirection = currentDirection.turnRight(amount)
-                'F' -> currentPoint = moveInDirection(currentPoint, currentDirection, amount)
+                NORTH -> currentPoint = currentPoint.moveNorth(amount)
+                SOUTH -> currentPoint = currentPoint.moveSouth(amount)
+                EAST -> currentPoint = currentPoint.moveEast(amount)
+                WEST -> currentPoint = currentPoint.moveWest(amount)
+                LEFT -> currentDirection = currentDirection.turnLeft(amount)
+                RIGHT -> currentDirection = currentDirection.turnRight(amount)
+                FORWARD -> currentPoint = currentDirection.movePointInDirection(currentPoint, amount)
                 else -> throw IllegalArgumentException("Unknown instruction $action")
             }
         }
@@ -32,12 +32,12 @@ class Day12(rawInput : List<String>) {
         instructions.forEach {
             val (action, amount) = it
             when (action) {
-                'N' -> waypointLocation = waypointLocation.moveNorth(amount)
-                'S' -> waypointLocation = waypointLocation.moveSouth(amount)
-                'E' -> waypointLocation = waypointLocation.moveEast(amount)
-                'W' -> waypointLocation = waypointLocation.moveWest(amount)
-                'L','R' -> waypointLocation = rotateWaypoint(waypointLocation, action == 'R', amount)
-                'F' -> shipLocation = moveTowardsWaypoint(shipLocation, waypointLocation, amount)
+                NORTH -> waypointLocation = waypointLocation.moveNorth(amount)
+                SOUTH -> waypointLocation = waypointLocation.moveSouth(amount)
+                EAST -> waypointLocation = waypointLocation.moveEast(amount)
+                WEST -> waypointLocation = waypointLocation.moveWest(amount)
+                LEFT, RIGHT -> waypointLocation = waypointLocation.rotate(action == RIGHT, amount)
+                FORWARD -> shipLocation = moveTowardsWaypoint(shipLocation, waypointLocation, amount)
                 else -> throw IllegalArgumentException("Unknown instruction $action")
             }
         }
@@ -45,34 +45,37 @@ class Day12(rawInput : List<String>) {
         return shipLocation.x.absoluteValue + shipLocation.y.absoluteValue
     }
 
-    private fun rotateWaypoint(waypointLoc : Point, turnRight : Boolean, amount: Int) : Point =
-        when(val rotation = Math.floorMod(if(turnRight) amount else -amount, 360)) {
-            0 -> waypointLoc
-            90 -> Point(x = waypointLoc.y, y = -waypointLoc.x)
-            180 -> Point(x = -waypointLoc.x, y = -waypointLoc.y)
-            270 -> Point(x = -waypointLoc.y, y = waypointLoc.x)
-            else -> throw  IllegalStateException("Unknown degree change $rotation")
-        }
-
     private fun moveTowardsWaypoint(shipLoc: Point, waypointLoc: Point, amount: Int) : Point =
         Point(x = shipLoc.x + waypointLoc.x * amount, y = shipLoc.y + waypointLoc.y * amount)
 
-    private fun moveInDirection(point: Point, direction: Direction, amount: Int) : Point =
-        when(direction) {
-            Direction.WEST -> point.moveWest(amount)
-            Direction.NORTH -> point.moveNorth(amount)
-            Direction.EAST -> point.moveEast(amount)
-            Direction.SOUTH -> point.moveSouth(amount)
-        }
+    companion object {
+        private const val NORTH = 'N'
+        private const val SOUTH = 'S'
+        private const val EAST = 'E'
+        private const val WEST = 'W'
+        private const val LEFT =  'L'
+        private const val RIGHT = 'R'
+        private const val FORWARD = 'F'
+    }
 
     private enum class Direction {
         WEST, NORTH, EAST, SOUTH;
 
-        fun turnLeft(degrees : Int) : Direction = turn(degrees) {currentIndex, indexChange -> currentIndex - indexChange }
+        fun turnLeft(degrees: Int): Direction =
+            turn(degrees) { currentIndex, indexChange -> currentIndex - indexChange }
 
-        fun turnRight(degrees : Int) : Direction = turn(degrees) {currentIndex, indexChange -> currentIndex + indexChange }
+        fun turnRight(degrees: Int): Direction =
+            turn(degrees) { currentIndex, indexChange -> currentIndex + indexChange }
 
-        private fun turn(degrees : Int, turnChange : (currentIndex : Int, indexChange : Int) -> Int) : Direction {
+        fun movePointInDirection(point: Point, amount: Int): Point =
+            when (this) {
+                WEST -> point.moveWest(amount)
+                NORTH -> point.moveNorth(amount)
+                EAST -> point.moveEast(amount)
+                SOUTH -> point.moveSouth(amount)
+            }
+
+        private fun turn(degrees: Int, turnChange: (currentIndex: Int, indexChange: Int) -> Int): Direction {
             val indexMove = degrees / 90
             val enumValues = values()
 
