@@ -36,8 +36,8 @@ class Day11(private val rawInput : List<String>) {
                     val currentPoint = Point(x, y)
                     when (char) {
                         FLOOR -> char
-                        UNOCCUPIED -> if (seatShouldBeOccupied(state, currentPoint)) OCCUPIED else char
-                        OCCUPIED -> if (seatShouldBeFreed(state, currentPoint)) UNOCCUPIED else char
+                        UNOCCUPIED -> if (seatShouldBeOccupied(state, currentPoint)) OCCUPIED else UNOCCUPIED
+                        OCCUPIED -> if (seatShouldBeFreed(state, currentPoint)) UNOCCUPIED else OCCUPIED
                         else -> throw IllegalStateException("Unknown char representation $char")
                     }
                 }.toCharArray()
@@ -71,7 +71,7 @@ class Day11(private val rawInput : List<String>) {
 
             var currentPoint : Point? = start
             do {
-                currentPoint = currentPoint?.copy(x = currentPoint.x + xVel, y = currentPoint.y + yVel)?.inBounds()
+                currentPoint = Point(x = currentPoint!!.x + xVel, y = currentPoint.y + yVel).inBounds()
             }  while (currentPoint != null && state.get(currentPoint) == FLOOR)
 
             return currentPoint
