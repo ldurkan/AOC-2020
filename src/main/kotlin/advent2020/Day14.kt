@@ -27,17 +27,12 @@ class Day14(rawInput : List<String>) {
         return addressMap.values.sum()
     }
 
+    private fun calculateValue(update: MemoryUpdate) : Long =
+        applyMask(update.mask, update.value) { maskValue -> maskValue != 'X' }
+            .toLong(2)
+
     private fun calculateAddresses(update: MemoryUpdate): List<Long> =
-        update.addr
-            .toString(2)
-            .padStart(update.mask.length, '0')
-            .mapIndexed {index, char ->
-                if (update.mask[index] != '0')
-                    update.mask[index]
-                else
-                    char
-            }
-            .joinToString("")
+        applyMask(update.mask, update.addr) { maskValue -> maskValue != '0' }
             .let { addr ->
                 val unresolvedAddresses = LinkedList(listOf(addr))
                 val resolvedAddresses = mutableListOf<String>()
@@ -60,31 +55,27 @@ class Day14(rawInput : List<String>) {
     private fun String.replaceCharAt(index : Int, char : Char) : String =
         this.substring(0 until index) + char + this.substring(index + 1)
 
-
-    private fun calculateValue(update: MemoryUpdate) : Long =
-        update.value
+    private fun applyMask(mask : String, value : Long, useMaskValue : (maskValue : Char) -> Boolean) : String =
+        value
             .toString(2)
-            .padStart(update.mask.length, '0')
+            .padStart(mask.length, '0')
             .mapIndexed {index, char ->
-                if (update.mask[index] != 'X')
-                    update.mask[index]
-                else
-                    char
+                if (useMaskValue(mask[index])) mask[index] else char
             }
             .joinToString("")
-            .toLong(2)
 
      data class MemoryUpdate(val mask : String, val addr : Long, val value : Long) {
         companion object {
+            private const val MASK_PREFIX = "mask = "
+
             fun parse(rawInput : List<String>) : List<MemoryUpdate> {
                 var currentMask = rawInput.first()
-                    .substring(7)
+                    .substring(MASK_PREFIX.length)
 
                 return rawInput.drop(1)
-                    .asSequence()
                     .mapNotNull { input ->
                         if (input.startsWith("mask")) {
-                            currentMask = input.substring(7)
+                            currentMask = input.substring(MASK_PREFIX.length)
                             null
                         } else {
                             val (addr, value) = input.split(" ", "=", "[", "]")
@@ -93,7 +84,7 @@ class Day14(rawInput : List<String>) {
                                 .map { it.toLong() }
                             MemoryUpdate(currentMask, addr, value)
                         }
-                    }.toList()
+                    }
             }
         }
     }
